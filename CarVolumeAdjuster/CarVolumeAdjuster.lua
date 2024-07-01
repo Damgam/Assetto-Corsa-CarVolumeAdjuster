@@ -43,17 +43,22 @@ function UpdateAllCarsVolume()
         local Transmission = ac.getAudioVolume('transmission')
         local Tyres = ac.getAudioVolume('tyres')
         local Wind = ac.getAudioVolume('wind')
+        local Opponents = ac.getAudioVolume('opponents')
 
         local masterVolume = ConfigFile:get(carFolder, "master", 1)
         local engineVolume = ConfigFile:get(carFolder, "engine", 1)
         local transmissionVolume = ConfigFile:get(carFolder, "transmission", 1)
         local tyresVolume = ConfigFile:get(carFolder, "tyres", 1)
         local windVolume = ConfigFile:get(carFolder, "wind", 1)
+        local opponentsVolume = ConfigFile:get(carFolder, "opponents", 1)
 
         ac.setAudioVolume('engine',         masterVolume*engineVolume*Engine,               carIndex)
         ac.setAudioVolume('transmission',   masterVolume*transmissionVolume*Transmission,   carIndex)
         ac.setAudioVolume('tyres',          masterVolume*tyresVolume*Tyres,                 carIndex)
+        ac.setAudioVolume('surfaces',       masterVolume*tyresVolume*Tyres,                 carIndex)
+        ac.setAudioVolume('dirt',           masterVolume*tyresVolume*Tyres,                 carIndex)
         ac.setAudioVolume('wind',           masterVolume*windVolume*Wind,                   carIndex)
+        ac.setAudioVolume('opponents',      masterVolume*opponentsVolume*Opponents,         carIndex)
     end
 end
 UpdateAllCarsVolume()
@@ -93,11 +98,22 @@ function CarTab()
                 ConfigFile:set(carFolder, "transmission", 1)
                 ConfigFile:set(carFolder, "tyres", 1)
                 ConfigFile:set(carFolder, "wind", 1)
+                ConfigFile:set(carFolder, "opponents", 1)
                 NeedToSave = true
                 ConfigFile:save()
             end
 
             ui.text("Fine Tuning")
+
+            local oldSliderValue = ConfigFile:get(carFolder, "opponents", 1)
+            local sliderValue = ui.slider("Opponents ##slider" .. SliderCounter, oldSliderValue, 0.01, 2)
+            if oldSliderValue ~= sliderValue then
+                oldSliderValue = sliderValue
+                ConfigFile:set(carFolder, "opponents", sliderValue)
+                NeedToSave = true
+                ConfigFile:save()
+            end
+            SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "engine", 1)
             local sliderValue = ui.slider("Engine ##slider" .. SliderCounter, oldSliderValue, 0.01, 2)
@@ -154,14 +170,13 @@ function TabsFunction()
 end
 
 function script.windowMain()
-    NeedToSave = false
     SliderCounter = 0
-
     ui.tabBar("Cars", {}, TabsFunction)
 
     if NeedToSave then
         UpdateAllCarsVolume()
     end
+    NeedToSave = false
 end
 
 ac.setWindowSizeConstraints('main', vec2(350,260), vec2(999999,260))
