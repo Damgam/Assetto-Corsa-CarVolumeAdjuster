@@ -179,4 +179,4 @@ function script.windowMain()
     NeedToSave = false
 end
 
-ac.setWindowSizeConstraints('main', vec2(350,260), vec2(999999,260))
+ac.setWindowSizeConstraints('main', vec2(400,280), vec2(999999,280))
