@@ -53,6 +53,8 @@ function UpdateAllCarsVolume()
         local engineVolume = ConfigFile:get(carFolder, "engine", 1)
         local transmissionVolume = ConfigFile:get(carFolder, "transmission", 1)
         local tyresVolume = ConfigFile:get(carFolder, "tyres", 1)
+        local surfacesVolume = ConfigFile:get(carFolder, "surfaces", 1)
+        local dirtVolume = ConfigFile:get(carFolder, "dirt", 1)
         local windVolume = ConfigFile:get(carFolder, "wind", 1)
         local opponentsVolume = ConfigFile:get(carFolder, "opponents", 1)
 
@@ -62,25 +64,28 @@ function UpdateAllCarsVolume()
         local tyresVolumeExterior = ConfigFile:get(carFolder, "tyresexterior", 1)
         local tyresVolumeInterior = ConfigFile:get(carFolder, "tyresinterior", 1)
 
+        local surfacesVolumeExterior = ConfigFile:get(carFolder, "surfacesexterior", 1)
+        local surfacesVolumeInterior = ConfigFile:get(carFolder, "surfacesinterior", 1)
+
         if ac.isInteriorView() then
             Engine = Engine*engineVolumeInterior
             Transmission = Transmission*engineVolumeInterior
             Tyres = Tyres*tyresVolumeInterior
-            Surfaces = Surfaces*tyresVolumeInterior
-            Dirt = Dirt*tyresVolumeInterior
+            Surfaces = Surfaces*surfacesVolumeInterior
+            Dirt = Dirt*surfacesVolumeInterior
         else
             Engine = Engine*engineVolumeExterior
             Transmission = Transmission*engineVolumeExterior
             Tyres = Tyres*tyresVolumeExterior
-            Surfaces = Surfaces*tyresVolumeExterior
-            Dirt = Dirt*tyresVolumeExterior
+            Surfaces = Surfaces*surfacesVolumeExterior
+            Dirt = Dirt*surfacesVolumeExterior
         end
 
         ac.setAudioVolume('engine',         masterVolume*engineVolume*Engine,               carIndex)
         ac.setAudioVolume('transmission',   masterVolume*transmissionVolume*Transmission,   carIndex)
         ac.setAudioVolume('tyres',          masterVolume*tyresVolume*Tyres,                 carIndex)
-        ac.setAudioVolume('surfaces',       masterVolume*tyresVolume*Surfaces,                 carIndex)
-        ac.setAudioVolume('dirt',           masterVolume*tyresVolume*Dirt,                 carIndex)
+        ac.setAudioVolume('surfaces',       masterVolume*surfacesVolume*Surfaces,           carIndex)
+        ac.setAudioVolume('dirt',           masterVolume*dirtVolume*Dirt,                   carIndex)
         ac.setAudioVolume('wind',           masterVolume*windVolume*Wind,                   carIndex)
         ac.setAudioVolume('opponents',      masterVolume*opponentsVolume*Opponents,         carIndex)
     end
@@ -112,13 +117,17 @@ function CarTab()
 
             ui.text("Main Volume")
             local oldSliderValue = ConfigFile:get(carFolder, "master", 1)
-            local sliderValue = ui.slider("Master ##slider" .. SliderCounter, oldSliderValue, 0.01, 2)
+            local sliderValue = ui.slider("Master ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "master", sliderValue)
                 if ui.itemEdited() then
                     NeedToSave = true
                 end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "master", 1)
+                NeedToSave = true
             end
             SliderCounter = SliderCounter+1
 
@@ -142,20 +151,22 @@ function CarTab()
             ui.text("Fine Tuning")
 
             local oldSliderValue = ConfigFile:get(carFolder, "opponents", 1)
-            local sliderValue = ui.slider("Opponents ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Opponents ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
-                ac.debug("oldSliderValue", oldSliderValue)
-                ac.debug("sliderValue", sliderValue)
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "opponents", sliderValue)
                 if ui.itemEdited() then
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "opponents", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "engine", 1)
-            local sliderValue = ui.slider("Engine ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Engine ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "engine", sliderValue)
@@ -163,10 +174,14 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "engine", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "transmission", 1)
-            local sliderValue = ui.slider("Transmission ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Transmission ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "transmission", sliderValue)
@@ -174,10 +189,14 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "transmission", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "tyres", 1)
-            local sliderValue = ui.slider("Tyres/Surfaces ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Tyres ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "tyres", sliderValue)
@@ -185,10 +204,44 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "tyres", 1)
+                NeedToSave = true
+            end
+            SliderCounter = SliderCounter+1
+
+            local oldSliderValue = ConfigFile:get(carFolder, "surfaces", 1)
+            local sliderValue = ui.slider("Surfaces ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
+            if oldSliderValue ~= sliderValue then
+                oldSliderValue = sliderValue
+                ConfigFile:set(carFolder, "surfaces", sliderValue)
+                if ui.itemEdited() then
+                    NeedToSave = true
+                end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "surfaces", 1)
+                NeedToSave = true
+            end
+            SliderCounter = SliderCounter+1
+
+            local oldSliderValue = ConfigFile:get(carFolder, "dirt", 1)
+            local sliderValue = ui.slider("Dirt ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
+            if oldSliderValue ~= sliderValue then
+                oldSliderValue = sliderValue
+                ConfigFile:set(carFolder, "dirt", sliderValue)
+                if ui.itemEdited() then
+                    NeedToSave = true
+                end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "dirt", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "wind", 1)
-            local sliderValue = ui.slider("Wind ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Wind ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "wind", sliderValue)
@@ -196,12 +249,16 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "wind", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             ui.text("Camera Multipliers - Applied on top of Fine Tuning values")
             
             local oldSliderValue = ConfigFile:get(carFolder, "engineinterior", 1)
-            local sliderValue = ui.slider("Engine/Transmission Interior ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Engine/Transmission Interior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "engineinterior", sliderValue)
@@ -209,10 +266,14 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "engineinterior", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "engineexterior", 1)
-            local sliderValue = ui.slider("Engine/Transmission Exterior ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Engine/Transmission Exterior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "engineexterior", sliderValue)
@@ -220,10 +281,14 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "engineexterior", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "tyresinterior", 1)
-            local sliderValue = ui.slider("Tyres/Surfaces Interior ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Tyres Interior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "tyresinterior", sliderValue)
@@ -231,16 +296,54 @@ function CarTab()
                     NeedToSave = true
                 end
             end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "tyresinterior", 1)
+                NeedToSave = true
+            end
             SliderCounter = SliderCounter+1
 
             local oldSliderValue = ConfigFile:get(carFolder, "tyresexterior", 1)
-            local sliderValue = ui.slider("Tyres/Surfaces Exterior ##slider" .. SliderCounter, oldSliderValue, 0.001, 2)
+            local sliderValue = ui.slider("Tyres Exterior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
             if oldSliderValue ~= sliderValue then
                 oldSliderValue = sliderValue
                 ConfigFile:set(carFolder, "tyresexterior", sliderValue)
                 if ui.itemEdited() then
                     NeedToSave = true
                 end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "tyresexterior", 1)
+                NeedToSave = true
+            end
+            SliderCounter = SliderCounter+1
+
+            local oldSliderValue = ConfigFile:get(carFolder, "surfacesinterior", 1)
+            local sliderValue = ui.slider("Surfaces/Dirt Interior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
+            if oldSliderValue ~= sliderValue then
+                oldSliderValue = sliderValue
+                ConfigFile:set(carFolder, "surfacesinterior", sliderValue)
+                if ui.itemEdited() then
+                    NeedToSave = true
+                end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "surfacesinterior", 1)
+                NeedToSave = true
+            end
+            SliderCounter = SliderCounter+1
+
+            local oldSliderValue = ConfigFile:get(carFolder, "surfacesexterior", 1)
+            local sliderValue = ui.slider("Surfaces/Dirt Exterior ##slider" .. SliderCounter, oldSliderValue, 0.001, 5)
+            if oldSliderValue ~= sliderValue then
+                oldSliderValue = sliderValue
+                ConfigFile:set(carFolder, "surfacesexterior", sliderValue)
+                if ui.itemEdited() then
+                    NeedToSave = true
+                end
+            end
+            if ui.itemClicked(ui.MouseButton.Right) then
+                ConfigFile:set(carFolder, "surfacesexterior", 1)
+                NeedToSave = true
             end
             SliderCounter = SliderCounter+1
 
@@ -269,4 +372,4 @@ function script.windowMain()
     NeedToSave = false
 end
 
-ac.setWindowSizeConstraints('main', vec2(400,400), vec2(999999,400))
+ac.setWindowSizeConstraints('main', vec2(400,520), vec2(999999,520))
